@@ -152,41 +152,56 @@ blogRouter.get("/myblogs", checkAuth, async (c)=>{
 
 
 // get ALLBLOGS from DB
-blogRouter.get("/bulk", async (c)=>{
+blogRouter.get("/bulk", async (c) => {
+    const page = Number(c.req.query("page")) || 1;  // Default page is 1
+    const limit = Number(c.req.query("limit")) || 9;  // Default limit is 9
+    const skip = (page - 1) * limit;
+
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate());
 
-
     try {
         const blog = await prisma.blog.findMany({
+            skip,       // Skip previous pages
+            take: limit, // Limit results per page
             orderBy: {
-                createdAt: 'desc' // Sort by createdAt property in descending order
+                createdAt: 'desc' // Sort by createdAt in descending order
             },
-            select:{
+            select: {
                 id: true,
-                title : true,
-                createdAt : true,
-                authorId : true,
-                author : {
-                    select :{
-                        username : true,
-                        name:true
+                title: true,
+                createdAt: true,
+                authorId: true,
+                author: {
+                    select: {
+                        username: true,
+                        name: true
                     }
                 }
             }
-        })
-        if(blog.length === 0){
-            return c.json({message : "No blogs found"})
+        });
+
+        const totalBlogs = await prisma.blog.count(); // Get total blog count
+
+        if (blog.length === 0) {
+            return c.json({ message: "No blogs found" });
         }
-        c.status(200);
-        return c.json(blog);
+
+        return c.json({
+            page,
+            limit,
+            totalPages: Math.ceil(totalBlogs / limit),
+            totalBlogs,
+            blogs: blog
+        });
+
     } catch (e) {
         console.log(e);
-        c.status(404);
-        return c.json({message : "Error while fetching blogs"})
+        return c.json({ message: "Error while fetching blogs" }, 500);
     }
-})
+});
+
 
 // get singleBLOG from DB
 blogRouter.get("/:blogId", async (c)=>{
