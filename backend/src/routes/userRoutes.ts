@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client/edge'
 import { sign } from 'hono/jwt'
 import { withAccelerate } from "@prisma/extension-accelerate";
 
-import {signUpSchema, signInSchema} from "@vikashdev/jotter-common"
+import {signUpSchema, signInSchema} from "@vikashdev/omnifyblog-common"
 import { checkAuth } from "../middlewares/auth";
 
 type User = {
