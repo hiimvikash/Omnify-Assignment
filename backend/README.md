@@ -1,13 +1,3 @@
-```
-npm install
-npm run dev
-```
-
-```
-npm run deploy
-```
-
-
 # How to start backend locally ? 
 
 - `npm install`
