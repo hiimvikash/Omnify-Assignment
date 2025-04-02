@@ -126,7 +126,14 @@ function Auth({type} : FormType) {
             {inputsError && type=="signup" && <div className="mt-5"><InputsError/></div>}
             {serverError && <div className="mt-5"><ServerError errorMessage = {errorMessage}/></div>}
             
-            
+            {/* Demo Credentials Card for Signin */}
+        {type === "signin" && (
+          <div className="mt-6 p-4 border border-gray-300 rounded-lg bg-gray-50 text-center shadow-md">
+            <p className="font-semibold text-gray-700">Demo Credentials</p>
+            <p className="text-sm text-gray-600">Username: <span className="font-mono font-medium">omnify</span></p>
+            <p className="text-sm text-gray-600">Password: <span className="font-mono font-medium">@20March2002</span></p>
+          </div>
+        )}
 
         </div>
     </div>
