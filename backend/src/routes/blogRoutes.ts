@@ -4,6 +4,15 @@ import { Hono } from "hono";
 import { checkAuth } from "../middlewares/auth";
 import { addBlogSchema, updateBlogSchema } from "@vikashdev/jotter-common";
 
+import { Redis } from "@upstash/redis/cloudflare";
+
+const redis = new Redis({
+  url: "https://open-loon-53111.upstash.io",
+  token: "Ac93AAIjcDE0OTgyYjZmZTE2MjI0MDJlYTZkNWE5MTBkODNlYzE4MnAxMA",
+});
+
+
+
 type User = {
     id : number,
     username : string,
@@ -56,6 +65,12 @@ blogRouter.post("/", checkAuth, async (c)=>{
                 }
             }
         })
+        const keys = await redis.keys("blogs:page:*"); // Fetch all blog page keys
+        if (keys.length > 0) {
+            await redis.del(...keys); // Delete all cached blog pages
+            console.log("Cache invalidated: Deleted all paginated blog entries");
+        }
+
         c.status(201);
         return c.json(blog);
     } catch (e) {
@@ -101,6 +116,12 @@ blogRouter.put("/:blogId", checkAuth, async (c)=>{
                 }
             }
         })
+        const keys = await redis.keys("blogs:page:*"); // Fetch all blog page keys
+        if (keys.length > 0) {
+            await redis.del(...keys); // Delete all cached blog pages
+            console.log("Cache invalidated: Deleted all paginated blog entries");
+        }
+
         c.status(201);
         return c.json(blog);
     } catch (e) {
@@ -153,6 +174,12 @@ blogRouter.get("/myblogs", checkAuth, async (c)=>{
 
 // get ALLBLOGS from DB
 blogRouter.get("/bulk", async (c) => {
+    try {
+        await redis.ping(); // Wait for the Redis connection check
+        console.log("Redis connected successfully");
+    } catch (err) {
+        console.error("Redis connection failed", err);
+    }
     const page = Number(c.req.query("page")) || 1;  // Default page is 1
     const limit = Number(c.req.query("limit")) || 9;  // Default limit is 9
     const skip = (page - 1) * limit;
@@ -162,6 +189,18 @@ blogRouter.get("/bulk", async (c) => {
     }).$extends(withAccelerate());
 
     try {
+
+        // ✅ Try fetching from Redis cache first
+        const cacheKey = `blogs:page:${page}`;
+        const cachedData = await redis.get(cacheKey);
+        
+        if (cachedData) {
+            console.log("✅ Returning cached data");
+            const parsedData = typeof cachedData === "string" ? JSON.parse(cachedData) : cachedData;
+
+            return c.json(parsedData);
+        }
+
         const blog = await prisma.blog.findMany({
             skip,       // Skip previous pages
             take: limit, // Limit results per page
@@ -182,19 +221,24 @@ blogRouter.get("/bulk", async (c) => {
             }
         });
 
-        const totalBlogs = await prisma.blog.count(); // Get total blog count
+        const totalBlogs = await prisma.blog.count(); // THIS WILL GIVE THE COUNT OF TOTAL BLOGS IN UR DB
 
         if (blog.length === 0) {
             return c.json({ message: "No blogs found" });
         }
 
-        return c.json({
+        const response = {
             page,
             limit,
             totalPages: Math.ceil(totalBlogs / limit),
             totalBlogs,
             blogs: blog
-        });
+        };
+
+        // Store in Redis WITHOUT EXPIRATION (Until Manually Invalidated)
+        await redis.set(cacheKey, JSON.stringify(response));
+
+        return c.json(response);
 
     } catch (e) {
         console.log(e);
@@ -279,6 +323,11 @@ blogRouter.delete("/:blogId", checkAuth, async (c) => {
         
 
         c.status(200);
+        const keys = await redis.keys("blogs:page:*"); // Fetch all blog page keys
+        if (keys.length > 0) {
+            await redis.del(...keys); // Delete all cached blog pages
+            console.log("Cache invalidated: Deleted all paginated blog entries");
+        }
         return c.json({ message: "Blog deleted successfully" });
     } catch (e) {
         c.status(500);

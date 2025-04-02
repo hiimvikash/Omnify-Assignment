@@ -3,9 +3,9 @@
   "name": "backend",
   "main": "src/index.ts",
   "compatibility_date": "2025-04-01",
-  // "compatibility_flags": [
-  //   "nodejs_compat"
-  // ],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "vars": { // will be access by application(index.ts)
     "DATABASE_URL": "prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiMTVmZmU1NTEtZDNlMS00MTc2LWEzYTQtZmYxN2I3ZDljZDNlIiwidGVuYW50X2lkIjoiMTQwYjAyMGIyYmYwMTEyZDM5ZTkyMGMxNDEzYTdhOWNiZTIzZGVhNDNiYjdlM2E1NjhkZTMzNGY5MzU1YWM3NSIsImludGVybmFsX3NlY3JldCI6Ijc3MTQyYjY5LWViYzUtNDMxMi05MzI4LTNmMmM0ZjQ1YjBmNiJ9.qo8I8UQjH9w9iO0oLa4RWJxYDz9HlWxSrpQDCTDtDiQ",
     "JWT_SECRET" : "omnify123"
