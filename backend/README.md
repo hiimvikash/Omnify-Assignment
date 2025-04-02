@@ -1,5 +1,5 @@
 # How to start backend locally ? 
-
+- cd backend
 - `npm install`
 - create `.env`
 ```
@@ -15,4 +15,5 @@ DATABASE_URL="postgresql://omnifyblog_owner:....."
 ```
 - run `npx prisma migrate dev --name init` to migrate all the table in your DB (this will access your DatabaseURL in .env)
 - run `npx prisma generate`
+- go to `/src/routes/blogRoutes` and update with ur REDIS URI.
 - run `npm run dev`
