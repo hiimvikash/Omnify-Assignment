@@ -1,3 +1,11 @@
+# Technology
+- **Frontend :** ReactJs, Typescript, Tailwind, Recoil (State management), Zod, ShadCN - UI
+- **Backend :** Hono, Cloudflare Workers, Postgress, Prisma-ORM, Prisma-Accelerate, Redis, Zod
+- **Deployment :-**
+    - **Frontend :** AWS Cloudfront, AWS S3
+    - **Backend :** Cloudflare Workers
+
+
 # How to start locally
 - clone this repo `git clone https://github.com/hiimvikash/Omnify-Assignment.git`
 
@@ -44,5 +52,7 @@
 - **DELETE**	`/:blogId`	✅ Delete a blog by blogId (only the author can delete). Caches are invalidated.
 - **POST**	`/:blogId/addcomment`	✅ Add a comment to a specific blog (requires authentication).
 - **DELETE**	`/comment/:commentId`	✅ Delete a comment by commentId (only the owner can delete).
+
+
 
 
