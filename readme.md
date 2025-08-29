@@ -24,6 +24,8 @@
 - In `wrangler.jsonc`
     - JWT_SECRET
     - DATABASE_URL = [Prisma Accelerate_URL]
+- In `blogRoutes.ts`
+  - `RedisURL` and `token`
 - run `npx prisma migrate dev --name init` = To migrate tables in ur DB
 - run `npx prisma generate`
 - run `npm run dev`
