@@ -6,11 +6,11 @@ import { addBlogSchema, updateBlogSchema } from "@vikashdev/jotter-common";
 
 import { Redis } from "@upstash/redis/cloudflare";
 
-const redis = new Redis({
-  url: "https://open-loon-53111.upstash.io",
-  token: "Ac93AAIjcDE0OTgyYjZmZTE2MjI0MDJlYTZkNWE5MTBkODNlYzE4MnAxMA",
-});
-
+const createRedis = (env: { REDIS_URL: string; REDIS_TOKEN: string }) =>
+  new Redis({
+    url: env.REDIS_URL,
+    token: env.REDIS_TOKEN,
+  });
 
 
 type User = {
@@ -22,7 +22,9 @@ type User = {
 export const blogRouter = new Hono<{
     Bindings :{
         DATABASE_URL : string,
-        JWT_SECRET : string
+        JWT_SECRET : string,
+        REDIS_URL: string,
+        REDIS_TOKEN: string
     },
     Variables : {
         userInfo : User
@@ -65,10 +67,15 @@ blogRouter.post("/", checkAuth, async (c)=>{
                 }
             }
         })
-        const keys = await redis.keys("blogs:page:*"); // Fetch all blog page keys
-        if (keys.length > 0) {
-            await redis.del(...keys); // Delete all cached blog pages
-            console.log("Cache invalidated: Deleted all paginated blog entries");
+        try {
+            const redis = createRedis(c.env);
+            const keys = await redis.keys("blogs:page:*");
+            if (keys.length > 0) {
+                await redis.del(...keys);
+                console.log("Cache invalidated: Deleted all paginated blog entries");
+            }
+        } catch (redisError) {
+            console.warn("Redis cache invalidation failed on create", redisError);
         }
 
         c.status(201);
@@ -116,10 +123,15 @@ blogRouter.put("/:blogId", checkAuth, async (c)=>{
                 }
             }
         })
-        const keys = await redis.keys("blogs:page:*"); // Fetch all blog page keys
-        if (keys.length > 0) {
-            await redis.del(...keys); // Delete all cached blog pages
-            console.log("Cache invalidated: Deleted all paginated blog entries");
+        try {
+            const redis = createRedis(c.env);
+            const keys = await redis.keys("blogs:page:*");
+            if (keys.length > 0) {
+                await redis.del(...keys);
+                console.log("Cache invalidated: Deleted all paginated blog entries");
+            }
+        } catch (redisError) {
+            console.warn("Redis cache invalidation failed on update", redisError);
         }
 
         c.status(201);
@@ -174,11 +186,14 @@ blogRouter.get("/myblogs", checkAuth, async (c)=>{
 
 // get ALLBLOGS from DB
 blogRouter.get("/bulk", async (c) => {
+    let redis: ReturnType<typeof createRedis> | null = null;
     try {
-        await redis.ping(); // Wait for the Redis connection check
+        redis = createRedis(c.env);
+        await redis.ping();
         console.log("Redis connected successfully");
     } catch (err) {
-        console.error("Redis connection failed", err);
+        console.warn("Redis unavailable; proceeding without cache", err);
+        redis = null;
     }
     const page = Number(c.req.query("page")) || 1;  // Default page is 1
     const limit = Number(c.req.query("limit")) || 9;  // Default limit is 9
@@ -192,13 +207,17 @@ blogRouter.get("/bulk", async (c) => {
 
         // ✅ Try fetching from Redis cache first
         const cacheKey = `blogs:page:${page}`;
-        const cachedData = await redis.get(cacheKey);
-        
-        if (cachedData) {
-            console.log("✅ Returning cached data");
-            const parsedData = typeof cachedData === "string" ? JSON.parse(cachedData) : cachedData;
-
-            return c.json(parsedData);
+        if (redis) {
+            try {
+                const cachedData = await redis.get(cacheKey);
+                if (cachedData) {
+                    console.log("✅ Returning cached data");
+                    const parsedData = typeof cachedData === "string" ? JSON.parse(cachedData) : cachedData;
+                    return c.json(parsedData);
+                }
+            } catch (cacheReadError) {
+                console.warn("Failed to read from Redis cache", cacheReadError);
+            }
         }
 
         const blog = await prisma.blog.findMany({
@@ -236,7 +255,13 @@ blogRouter.get("/bulk", async (c) => {
         };
 
         // Store in Redis WITHOUT EXPIRATION (Until Manually Invalidated)
-        await redis.set(cacheKey, JSON.stringify(response));
+        if (redis) {
+            try {
+                await redis.set(cacheKey, JSON.stringify(response));
+            } catch (cacheWriteError) {
+                console.warn("Failed to write to Redis cache", cacheWriteError);
+            }
+        }
 
         return c.json(response);
 
@@ -323,10 +348,15 @@ blogRouter.delete("/:blogId", checkAuth, async (c) => {
         
 
         c.status(200);
-        const keys = await redis.keys("blogs:page:*"); // Fetch all blog page keys
-        if (keys.length > 0) {
-            await redis.del(...keys); // Delete all cached blog pages
-            console.log("Cache invalidated: Deleted all paginated blog entries");
+        try {
+            const redis = createRedis(c.env);
+            const keys = await redis.keys("blogs:page:*");
+            if (keys.length > 0) {
+                await redis.del(...keys);
+                console.log("Cache invalidated: Deleted all paginated blog entries");
+            }
+        } catch (redisError) {
+            console.warn("Redis cache invalidation failed on delete", redisError);
         }
         return c.json({ message: "Blog deleted successfully" });
     } catch (e) {

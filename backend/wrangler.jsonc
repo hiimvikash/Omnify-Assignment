@@ -7,8 +7,10 @@
     "nodejs_compat"
   ],
   "vars": { // will be access by application(index.ts)
-    "DATABASE_URL": "prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiMTVmZmU1NTEtZDNlMS00MTc2LWEzYTQtZmYxN2I3ZDljZDNlIiwidGVuYW50X2lkIjoiMTQwYjAyMGIyYmYwMTEyZDM5ZTkyMGMxNDEzYTdhOWNiZTIzZGVhNDNiYjdlM2E1NjhkZTMzNGY5MzU1YWM3NSIsImludGVybmFsX3NlY3JldCI6Ijc3MTQyYjY5LWViYzUtNDMxMi05MzI4LTNmMmM0ZjQ1YjBmNiJ9.qo8I8UQjH9w9iO0oLa4RWJxYDz9HlWxSrpQDCTDtDiQ",
-    "JWT_SECRET" : "omnify123"
+  "DATABASE_URL":"prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqd3RfaWQiOjEsInNlY3VyZV9rZXkiOiJza185OWdTU3lrMmJWU2NmZlE4TE00d0giLCJhcGlfa2V5IjoiMDFLM1Y2NUJRVERINjlBUEZOM1BLVlo2QzAiLCJ0ZW5hbnRfaWQiOiIxMjQ1N2M3YjQyODcxYTllZDA4NzQ5MmY1NzY5YWZjNGY5YmVjNTAwM2IzNTk4Mzg1OWNiYjk2ZjEwOTkxZTNjIiwiaW50ZXJuYWxfc2VjcmV0IjoiNDE5ZGZlMTMtZWFkMi00MWVhLTllZGEtNDEzMmMyYzBkMTg5In0.JOZ9PiQTInPJ--KVxDOf-jXwbgSHYkYCzOeRnNNALzc",
+    "JWT_SECRET" : "omnify123",
+    "REDIS_URL": "https://easy-gobbler-19718.upstash.io",
+    "REDIS_TOKEN": "AU0GAAIncDE4Yjk2NDYwNzk1ZWE0ODMzYmUyMzQwMmVjMTA4NmY5N3AxMTk3MTg"
   },
 
   // "kv_namespaces": [
