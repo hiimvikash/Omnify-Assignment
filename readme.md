@@ -17,19 +17,22 @@
 - Keep following things handy
     - [NeonDB **post**gress_URL]
     - [Prisma Accelerate_URL]
-    - [Redis URL]
+    - [REDIS_URL]
+    - [REDIS_TOKEN]
 - In `.env` 
     - DATABASE_URL = `[NeonDB **post**gress_URL]`
-    - REDIS_URI = `[Redis URL]`
 - In `wrangler.jsonc`
     - JWT_SECRET
     - DATABASE_URL = [Prisma Accelerate_URL]
-- In `blogRoutes.ts`
-  - `RedisURL` and `token`
+    - [REDIS_URL]
+    - [REDIS_TOKEN]
 - run `npx prisma migrate dev --name init` = To migrate tables in ur DB
 - run `npx prisma generate`
 - run `npm run dev`
 - Your backend is running @ `localhost:8787`
+
+## Deploy Backend
+- `npx wrangler whoami`
 ## Frontend 
 - `cd frontend`
 - `npm install`
