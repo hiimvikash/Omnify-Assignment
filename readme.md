@@ -33,6 +33,7 @@
 
 ## Deploy Backend
 - `npx wrangler whoami`
+- `npx wrangler deploy`
 ## Frontend 
 - `cd frontend`
 - `npm install`
