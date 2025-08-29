@@ -130,7 +130,7 @@ function Auth({type} : FormType) {
         {type === "signin" && (
           <div className="mt-6 p-4 border border-gray-300 rounded-lg bg-gray-50 text-center shadow-md">
             <p className="font-semibold text-gray-700">Demo Credentials</p>
-            <p className="text-sm text-gray-600">Username: <span className="font-mono font-medium">omnify</span></p>
+            <p className="text-sm text-gray-600">Username: <span className="font-mono font-medium">hellodemo</span></p>
             <p className="text-sm text-gray-600">Password: <span className="font-mono font-medium">@20March2002</span></p>
           </div>
         )}
