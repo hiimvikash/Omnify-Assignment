@@ -7,7 +7,7 @@
 
 
 # How to start locally
-- clone this repo `git clone https://github.com/hiimvikash/Omnify-Assignment.git`
+- clone this repo `git clone https://github.com/hiimvikash/jotterv2.git`
 
 
 
